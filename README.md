@@ -2,8 +2,7 @@
 
 Instalamos la dependencia:
 
-`$ pip install tqdm`
-
+```bash $ pip install tqdm ```
 
 Añadimos a las variables el enlace de 2 archivos .txt, estos deben estar en la nube/hosting:
 
