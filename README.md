@@ -1,7 +1,7 @@
 # ¿Qué hace?
 Este script permite descargar e instalar mods en Minecraft desde la nube, lo que facilita enormemente el proceso de jugar con amigos y actualizar Minecraft, Forge o los mods. Lee una ruta de configuración desde un archivo JSON y verifica si el usuario tiene instalado Minecraft Forge; si no lo tiene, lo descarga e instala automáticamente. Luego descomprime el archivo del mod en la carpeta correspondiente de mods de Minecraft.
 
-# Como instalarlo
+# ¿Cómo instalarlo?
 Instalar la dependencia con el siguiente comando:
 ```
 pip install tqdm
