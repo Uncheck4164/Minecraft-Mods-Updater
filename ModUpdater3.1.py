@@ -121,10 +121,9 @@ def verificar_version(urlVersion,rutaMods):
         with open(f"{rutaMods}/version.txt", "w") as f:
             f.write(version_actual)
 
-def mc_forge_version(ruta):
-    url = 'https://linkcube3143.000webhostapp.com/minecraft_forge.txt'
+def mc_forge_version(ruta,minecraft_forge):
     ruta_local = f'{ruta}/minecraft_forge.txt'
-    urllib.request.urlretrieve(url, ruta_local)
+    urllib.request.urlretrieve(minecraft_forge, ruta_local)
 
     with open(ruta_local, 'r') as archivo:
         datos = archivo.readlines()
@@ -141,11 +140,13 @@ def crear_carpeta_mods(rutaMods):
     else:
         print("Okey..")
      
-url_version = "https://linkcube3143.000webhostapp.com/version.txt"
-url_archivo = "https://linkcube3143.000webhostapp.com/mods.zip"    
+url_version = ""
+url_archivo = ""
+minecraft_forge = ""
+
 ruta = ruta_minecraft(pregunta_ruta())
 ruta_mods = os.path.join(ruta, 'mods')
-minecraft_version, forge_version = mc_forge_version(ruta)
+minecraft_version, forge_version = mc_forge_version(ruta,minecraft_forge)
 
 forge = verificar_forge(ruta,minecraft_version,forge_version)
 if not forge:
