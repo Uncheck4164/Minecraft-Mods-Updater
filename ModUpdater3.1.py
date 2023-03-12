@@ -4,14 +4,23 @@ import os
 from tqdm import tqdm
 import requests
 import subprocess
-#Sorry futuro yo o persona que lea esto por el desorden xd
+import json
+import time
+# Rellenar variables con urls de hosting/nube
+with open("config.json") as f:
+    config = json.load(f)
+
+
+url_version = config["url_version"]
+url_archivo = config["url_archivo"]
+minecraft_forge = config["minecraft_forge"]
 
 def pregunta_ruta():
     print("\033[4;31m"+"IMPORTANTE SE BORRARAN TODOS TUS ARCHIVOS DE .MINECRAFT/MODS"+ "\033[0m")
     pregunta = input("¿Has editado la ruta de tu .minecraft? 1.Sí 2.No: ")
-    while not pregunta.isdigit() or int(pregunta) not in [1, 2]:
-        pregunta = input("Por favor, ingresa una opción válida (1 o 2): ")
-    return int(pregunta)
+    pregunta = int(pregunta) if pregunta.isdigit() and int(pregunta) in [1, 2] else pregunta_ruta()
+    ruta = ruta_minecraft(pregunta)
+    return ruta
 
 def ruta_minecraft(preguntaRuta):
     ruta_minecraft = os.path.join(os.environ['APPDATA'], '.minecraft')
@@ -19,28 +28,37 @@ def ruta_minecraft(preguntaRuta):
     if not os.path.exists(ruta_minecraft) and preguntaRuta == 2:
         print("La ruta de .Minecraft no existe. Verifica la ruta.")
         print("""
-            Lista de posibles errores
-            -No has abierto Minecraft
-            -Tienes .Minecraft en otro disco duro o ubicación, sí es el caso seleccione opción 1
-            -No has instalado Minecraft
+            Lista de posibles errores:
+            - No has abierto Minecraft.
+            - Tienes .Minecraft en otro disco duro o ubicación; si es el caso, selecciona la opción 1.
+            - No has instalado Minecraft.
+
             ¿Cómo verificarlo?
-            Presione -tecla Windows-
-            escriba %APPDATA%
-            Verifique que exista .Minecraft
-            Si existe comuniquese conmigo por Discord: nadie#1565  
+            Presiona la tecla Windows.
+            Escribe %APPDATA%.
+            Verifica que exista .Minecraft.
         """)
         return None
-    if (preguntaRuta == 1 and os.path.exists(ruta_minecraft)) or not os.path.exists(ruta_minecraft):
-        print("\033[91mTu .minecraft se detectada correctamente ¿seguro quieres continuar? si no cierra y vuelve abrir\033[0m")
-        while preguntaRuta == 1:
-            ruta_minecraft = input("Introduce la ruta de una carpeta atras de .minecraft, ejemplo C:/Users/AppData/Roaming: ")
+    
+    if preguntaRuta == 1:
+        if os.path.exists(ruta_minecraft):
+            respuesta_confirmacion = input(".minecraft se ha detectado correctamente. ¿Estás seguro de que quieres continuar? 1.Sí 2.No: ")
+            if respuesta_confirmacion.isdigit() and int(respuesta_confirmacion) == 2:
+                pregunta_ruta()
+                return ruta_minecraft
 
-            if os.path.exists(os.path.join(ruta_minecraft, ".minecraft")):
-                print(".minecraft existe en la ruta:", os.path.join(ruta_minecraft, ".minecraft"))
+        while preguntaRuta == 1:
+            ruta_minecraft = input("Introduce la ruta de la carpeta .minecraft, por ejemplo, C:/Users/AppData/Roaming/.minecraft: ")
+            ruta_minecraft = os.path.normpath(ruta_minecraft)
+
+            if os.path.exists(os.path.join(os.path.dirname(ruta_minecraft), ".minecraft")):
+                ruta_minecraft = (ruta_minecraft)
+                print(".minecraft se ha detectado correctamente en la ruta:", ruta_minecraft)
                 preguntaRuta = None
-                ruta_minecraft = os.path.join(ruta_minecraft, ".minecraft")
+                respuesta_confirmacion = None
             else:
-                print(".minecraft no existe en la ruta:", os.path.join(ruta_minecraft, ".minecraft"))
+                print(".minecraft no se ha encontrado en la ruta proporcionada:", ruta_minecraft)
+
     return ruta_minecraft
 
 def verificar_forge(rutaMinecraft,minecraftVersion,forgeVersion):
@@ -77,24 +95,30 @@ def descargar_forge(minecraftVersion,forgeVersion,rutaMods):
         print("\033[91m" + "No se ha instalado Forge." + "\033[0m")
         return False
 
-def descargar_archivo(urlArchivo, nombreArchivo, rutaDestino):
+def descargar_archivo(urlArchivo, nombreArchivo, rutaMods):
     """
+    Elimina los archivos de la carpeta mods
     Descarga el archivo desde la URL y lo guarda en la ruta especificada.
     url_archivo: str - La URL del archivo a descargar.
     nombre_archivo: str - El nombre del archivo que se guardará en la ruta especificada.
     ruta_destino: str - La ruta donde se guardará el archivo descargado.
     """
+    for archivo in os.listdir(rutaMods):
+        archivo_path = os.path.join(rutaMods, archivo)
+        if os.path.isfile(archivo_path):
+            os.remove(archivo_path)
+    
     with tqdm(unit="B", unit_scale=True, unit_divisor=1024) as t:
-        urllib.request.urlretrieve(urlArchivo, f"{rutaDestino}/{nombreArchivo}", 
+        urllib.request.urlretrieve(urlArchivo, f"{rutaMods}/{nombreArchivo}", 
                                    reporthook=lambda blocknum, blocksize, totalsize: t.update(blocksize))
-    zip_file = zipfile.ZipFile(f"{rutaDestino}/{nombreArchivo}", 'r')
+    zip_file = zipfile.ZipFile(f"{rutaMods}/{nombreArchivo}", 'r')
     with tqdm(total=len(zip_file.namelist()), unit='file', unit_scale=True, unit_divisor=1024, miniters=1,
               desc='Extrayendo archivo') as t:
         for archivo in zip_file.namelist():
-            zip_file.extract(archivo, rutaDestino)
+            zip_file.extract(archivo, rutaMods)
             t.update()
     zip_file.close()
-    os.remove(f"{rutaDestino}/{nombreArchivo}")
+    os.remove(f"{rutaMods}/{nombreArchivo}")
 
 def verificar_version(urlVersion,rutaMods):
     """
@@ -140,11 +164,8 @@ def crear_carpeta_mods(rutaMods):
     else:
         print("Okey..")
      
-url_version = ""
-url_archivo = ""
-minecraft_forge = ""
+ruta = pregunta_ruta()
 
-ruta = ruta_minecraft(pregunta_ruta())
 ruta_mods = os.path.join(ruta, 'mods')
 minecraft_version, forge_version = mc_forge_version(ruta,minecraft_forge)
 

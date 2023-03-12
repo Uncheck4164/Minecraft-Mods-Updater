@@ -3,15 +3,16 @@
 Instalar la dependencia con el siguiente comando:
 ```
 pip install tqdm
+pip install requests
  ```
 
 Rellenar las variables `url_version` y `minecraft_forge` con los enlaces de los archivos `version.txt` y `minecraft_forge.txt` respectivamente. Estos archivos deben estar alojados en la nube o en un servidor. Las variables quedarían así:
 
-- url_version = "https://yourhost.000webhostapp.com/version.txt"
-- minecraft_forge = "https://yourhost.000webhostapp.com/minecraft_forge.txt"
+- url_version = "https://yourhost/version.txt"
+- minecraft_forge = "https://yourhost/minecraft_forge.txt"
 
 Agregar el archivo `.zip` con los mods, que debe llamarse `mods.zip`, de la siguiente manera:
-- url_archivo = "https://yourhost.000webhostapp.com/mods.zip"
+- url_archivo = "https://yourhostcom/mods.zip"
 
 En el archivo `version.txt`, agregar la versión del programa. Por ejemplo:
 - 1.0
