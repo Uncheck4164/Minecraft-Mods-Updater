@@ -23,5 +23,5 @@ Y en "minecraft_forge" va la versión de Minecraft y la de Forge, estas tienen q
 
 Luego, para convertirlo a un archivo .exe puedes utilizar auto-py-to-exe. Y con eso, ya queda listo para su uso 👌.
 
-- Dato importante:
-esto solo añade mods a la carpeta "mods" de la PC de alguien. Solo fue testeado en Windows y no profundicé sobre otros sistemas operativos. Lo único que hace este pequeño script es descargar el .zip y descomprimirlo en la carpeta "mods", nada más (podría modificar este código en el futuro para hacer más funciones).
+<p style="color:red"><b>Dato importante:</b> esto solo añade mods a la carpeta "mods" de la PC de alguien. Solo fue testeado en Windows y no profundicé sobre otros sistemas operativos. Lo único que hace este pequeño script es descargar el .zip y descomprimirlo en la carpeta "mods", nada más (podría modificar este código en el futuro para hacer más funciones).</p>
+
