@@ -29,4 +29,4 @@ Para convertir el archivo a un ejecutable `.exe`, se puede utilizar la herramien
 **Dato importante**:
 Este script fue diseñado para mi uso personal y, aunque aún estoy aprendiendo, si alguien más puede beneficiarse de él, me alegra mucho 🫡. Actualmente, el programa se limita a añadir los `mods` a la carpeta correspondiente en la PC del usuario, sin instalarlos ni llevar a cabo ninguna otra acción, y solo es compatible con Forge. Ha sido probado únicamente en Windows y no se ha profundizado en su funcionamiento en otros sistemas operativos. El único objetivo de este pequeño programa es descargar el archivo `.zip` y descomprimirlo en la carpeta `mods`. En el futuro, se podrían añadir más funcionalidades al código para mejorar su utilidad.
 
-Es posible que existan algunos bugs en el programa, ya que solo puedo desarrollar por las noches y puede que esté un poco cansado. Si encuentra algún error, por favor comuníquese conmigo en nadie#1565.
+Es posible que existan algunos bugs en el programa, ya que solo puedo desarrollar por las noches y puede que esté un poco cansado. Si encuentra algún error, por favor hablame nadie#1565.
