@@ -1,5 +1,7 @@
-# ¿Cómo ejecutarlo?
+# ¿Qué hace?
+Este script permite descargar e instalar mods en Minecraft desde la nube, lo que facilita enormemente el proceso de jugar con amigos y actualizar Minecraft, Forge o los mods. Lee una ruta de configuración desde un archivo JSON y verifica si el usuario tiene instalado Minecraft Forge; si no lo tiene, lo descarga e instala automáticamente. Luego descomprime el archivo del mod en la carpeta correspondiente de mods de Minecraft.
 
+# Como instalarlo
 Instalar la dependencia con el siguiente comando:
 ```
 pip install tqdm
@@ -25,4 +27,6 @@ En el archivo `minecraft_forge.txt`, agregar la versión de Minecraft y la de Fo
 Para convertir el archivo a un ejecutable `.exe`, se puede utilizar la herramienta `auto-py-to-exe`. Una vez hecho esto, el programa está listo para ser utilizado.
 
 **Dato importante**:
-Este script solo añade los `mods` a la carpeta mods de la PC del usuario. Ha sido probado únicamente en Windows y no se ha profundizado sobre su funcionamiento en otros sistemas operativos. El único objetivo de este pequeño programa es descargar el archivo `.zip` y descomprimirlo en la carpeta `mods`, nada más. (En el futuro, se podrían añadir más funcionalidades al código).
+Este script fue diseñado para mi uso personal y, aunque aún estoy aprendiendo, si alguien más puede beneficiarse de él, me alegra mucho 🫡. Actualmente, el programa se limita a añadir los `mods` a la carpeta correspondiente en la PC del usuario, sin instalarlos ni llevar a cabo ninguna otra acción, y solo es compatible con Forge. Ha sido probado únicamente en Windows y no se ha profundizado en su funcionamiento en otros sistemas operativos. El único objetivo de este pequeño programa es descargar el archivo `.zip` y descomprimirlo en la carpeta `mods`. En el futuro, se podrían añadir más funcionalidades al código para mejorar su utilidad.
+
+Es posible que existan algunos bugs en el programa, ya que solo puedo desarrollar por las noches y puede que esté un poco cansado. Si encuentra algún error, por favor comuníquese conmigo en nadie#1565.
