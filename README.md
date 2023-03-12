@@ -3,14 +3,14 @@
 Instalamos la dependencia:
 
 ```
-$ pip install tqdm
+pip install tqdm
  ```
 
 Añadimos a las variables el enlace de 2 archivos .txt, estos deben estar en la nube/hosting:
 
-version.txt
-minecraft_forge.txt
-Quedaría como:
+version.txt<br>
+minecraft_forge.txt<br>
+quedaría como:
 - url_version = "https://yourhost.000webhostapp.com/version.txt"
 - minecraft_forge = "https://yourhost.000webhostapp.com/minecraft_forge.txt"
 
