@@ -76,7 +76,77 @@ def verificar_forge(rutaMinecraft,minecraftVersion,forgeVersion):
     print(f"\033[33mForge está instalado en la carpeta: {forge_dir}\033[0m")
     time.sleep(1.3)
     return True
-def descargar_forge(minecraftVersion,forgeVersion,rutaMods):
+
+def find_java():
+    java_path = None
+    if os.name == 'nt':  # Windows
+        print("Windows")
+        time.sleep(0.7)
+        try:
+            # Intenta obtener la variable de entorno JAVA_HOME
+            java_home = os.environ['JAVA_HOME']
+            if os.path.exists(java_home):
+                # Busque el ejecutable java en el directorio JAVA_HOME
+                java_path = os.path.join(java_home, 'bin', 'java.exe')
+        except KeyError:
+            # Si la variable de entorno JAVA_HOME no está configurada, busque java en la RUTA
+            for path in os.environ['PATH'].split(os.pathsep):
+                java_path = os.path.join(path, 'java.exe')
+                if os.path.exists(java_path):
+                    break
+        if not java_path:
+            raise Exception('No se encontró una instalación de Java en el sistema.')
+    else:  # Unix-based system
+        print("Unix o MacOs")
+        time.sleep(1.2)
+        try:
+            subprocess.check_output(['which', 'java'])
+            java_path = 'java'
+        except subprocess.CalledProcessError:
+            raise Exception('No se encontró una instalación de Java en el sistema.')
+    return java_path
+
+#def descargar_forge(minecraftVersion, forgeVersion, rutaMinecraft):
+    installer_url = f"https://maven.minecraftforge.net/net/minecraftforge/forge/{version}/forge-{version}-installer.jar"
+
+    while respuesta.lower() not in ("s", "n"):
+        respuesta = input("¿Desea instalar Forge? (s/n)")
+        if respuesta.lower() == "s":
+            url = f"https://files.minecraftforge.net/maven/net/minecraftforge/forge/{minecraftVersion}-{forgeVersion}/forge-{minecraftVersion}-{forgeVersion}-installer.jar"
+            nombre_archivo = f"forge-{minecraftVersion}-{forgeVersion}-installer.jar"
+            ruta_descarga = os.path.join(rutaMinecraft, nombre_archivo)
+
+            print("\033[32m" + f"Descargando {nombre_archivo} desde {url}" + "\033[0m")
+            time.sleep(1)
+            respuesta = requests.get(url)
+
+            with open(ruta_descarga, "wb") as archivo:
+                archivo.write(respuesta.content)
+            os.system("cls")
+            print("\033[0;32m"+"Descarga completa!"+ "\033[0m")
+            time.sleep(1)
+            os.system("cls")
+
+            print("\033[0;32m"+"Instalando "+nombre_archivo+"..."+ "\033[0m")
+            time.sleep(2)
+            os.system("cls")
+            java_path = find_java()
+            if java_path is not None:
+                subprocess.call([java_path, "-jar", rutaMinecraft + f"\{nombre_archivo}", "--installServer", ruta_descarga])
+            else:
+                print("\033[91m" + "Java no está instalado en este sistema." + "\033[0m")
+            # Eliminar el instalador de Forge
+            os.remove(f"forge-{minecraftVersion}-{forgeVersion}-installer.jar")
+            print("\033[0;32m"+"¡Instalación completa!"+ "\033[0m")
+            time.sleep(1.3) 
+            return True
+        elif respuesta.lower() == "n":
+            print("\033[91m" + "No se ha instalado Forge." + "\033[0m")
+            return False
+        else:
+            print("\033[91m" + "Respuesta inválida. Por favor ingrese 's' o 'n'." + "\033[0m")
+
+def descargar_forge(minecraftVersion,forgeVersion,ruta):
     # Preguntar al usuario si desea instalar Forge
     respuesta = input("¿Desea instalar Forge? (s/n)")
     if respuesta.lower() == "s":
@@ -159,17 +229,18 @@ def verificar_version(urlVersion,rutaMods):
         with open(f"{rutaMods}/version.txt", "w") as f:
             f.write(version_actual)
         os.system("pause")
-def mc_forge_version(ruta,minecraft_forge):
+def mc_and_forge_version(ruta,minecraftForge):
     ruta_local = f'{ruta}/minecraft_forge.txt'
-    urllib.request.urlretrieve(minecraft_forge, ruta_local)
+    urllib.request.urlretrieve(minecraftForge, ruta_local)
 
     with open(ruta_local, 'r') as archivo:
         datos = archivo.readlines()
 
     minecraft_version = datos[0].strip()
     forge_version = datos[1].strip()
+    app_version = datos[2].strip()
 
-    return minecraft_version, forge_version
+    return minecraft_version, forge_version, app_version
 
 def crear_carpeta_mods(rutaMods):
     if not os.path.exists(rutaMods):
@@ -179,20 +250,23 @@ def crear_carpeta_mods(rutaMods):
     else:
         print("\033[32mOkey\033[0m...")
         time.sleep(1.2)
+    
+        
 ruta = pregunta_ruta()
-
 ruta_mods = os.path.join(ruta, 'mods')
-minecraft_version, forge_version = mc_forge_version(ruta,minecraft_forge)
-
+minecraft_version, forge_version, app_version = mc_and_forge_version(ruta,minecraft_forge)
+print(f"V{app_version} App")
+time.sleep(1)
+os.system("cls")
+find_java()
 forge = verificar_forge(ruta,minecraft_version,forge_version)
+
 if not forge:
-    descargar_forge(minecraft_version,forge_version,ruta_mods)
+    descargar_forge(minecraft_version,forge_version,ruta)
 if not os.path.exists(os.path.join(ruta, 'versions', f'{minecraft_version}-forge-{forge_version}')):
     print("\033[31m"+"No se puede continuar sin forge. Si lo descarga y no funciona, comuníquese conmigo nadie#1565." + "\033[0m")
     os.system("pause")
     exit()
 
-
 crear_carpeta_mods(ruta_mods)
-
 verificar_version(url_version,ruta_mods)
