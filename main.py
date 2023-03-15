@@ -74,7 +74,7 @@ def verificar_forge(rutaMinecraft,minecraftVersion,forgeVersion):
     forge_dir = os.path.join(rutaMinecraft, 'versions', f'{minecraftVersion}-forge-{forgeVersion}')
     if not os.path.isdir(forge_dir):
         print(f"\033[4;31mForge no está instalado para Minecraft {minecraftVersion}. O hubo una actualización.\033[0m")
-        return None
+        return
     print(f"\033[33mForge está instalado en la carpeta: {forge_dir}\033[0m")
     time.sleep(1.3)
     return True
@@ -108,35 +108,34 @@ def find_java():
             raise Exception('No se encontró una instalación de Java en el sistema.')
     return java_path
 
-
 def descargar_forge(minecraftVersion,forgeVersion,ruta):
     # Preguntar al usuario si desea instalar Forge
     respuesta = input("¿Desea instalar Forge? (s/n)")
-    if respuesta.lower() == "s":
-        url = f"https://files.minecraftforge.net/maven/net/minecraftforge/forge/{minecraftVersion}-{forgeVersion}/forge-{minecraftVersion}-{forgeVersion}-installer.jar"
-        nombre_archivo = f"forge-{minecraftVersion}-{forgeVersion}-installer.jar"
-        ruta_descarga = os.path.join(os.getcwd(), nombre_archivo)
-    
-        print("\033[32m" + f"Descargando {nombre_archivo} desde {url}" + "\033[0m")
-        respuesta = requests.get(url)
-    
-        with open(ruta_descarga, "wb") as archivo:
-            archivo.write(respuesta.content)
-    
-        print("\033[0;32m"+"Descarga completa!"+ "\033[0m")
-    
-        print("\033[0;32m"+"Instalando "+nombre_archivo+"..."+ "\033[0m")
-        subprocess.call(["java", "-jar", ruta_descarga])
-        # Eliminar el instalador de Forge
-        os.remove(f"forge-{minecraftVersion}-{forgeVersion}-installer.jar")
-        os.remove("installer.log")
-        print("\033[0;32m"+"¡Instalación completa!"+ "\033[0m")
-        time.sleep(1.3) 
-        return True
-    else:
+    if respuesta.lower() != "s":
         print("\033[91m" + "No se ha instalado Forge." + "\033[0m")
         return False
+     
+    url = f"https://files.minecraftforge.net/maven/net/minecraftforge/forge/{minecraftVersion}-{forgeVersion}/forge-{minecraftVersion}-{forgeVersion}-installer.jar"
+    nombre_archivo = f"forge-{minecraftVersion}-{forgeVersion}-installer.jar"
+    ruta_descarga = os.path.join(os.getcwd(), nombre_archivo)
 
+    print("\033[32m" + f"Descargando {nombre_archivo} desde {url}" + "\033[0m")
+    respuesta = requests.get(url)
+
+    with open(ruta_descarga, "wb") as archivo:
+        archivo.write(respuesta.content)
+
+    print("\033[0;32m"+"Descarga completa!"+ "\033[0m")
+
+    print("\033[0;32m"+"Instalando "+nombre_archivo+"..."+ "\033[0m")
+    subprocess.call(["java", "-jar", ruta_descarga])
+    # Eliminar el instalador de Forge
+    os.remove(f"forge-{minecraftVersion}-{forgeVersion}-installer.jar")
+    os.remove("installer.log")
+    print("\033[0;32m"+"¡Instalación completa!"+ "\033[0m")
+    time.sleep(1.3) 
+    return True
+        
 def descargar_archivo(urlArchivo, nombreArchivo, rutaMods):
     """
     Elimina los archivos de la carpeta mods
@@ -150,9 +149,11 @@ def descargar_archivo(urlArchivo, nombreArchivo, rutaMods):
         if os.path.isfile(archivo_path):
             os.remove(archivo_path)
     
+    # Desca archivo mods.zip
     with tqdm(unit="B", unit_scale=True, unit_divisor=1024) as t:
         urllib.request.urlretrieve(urlArchivo, f"{rutaMods}/{nombreArchivo}", 
                                    reporthook=lambda blocknum, blocksize, totalsize: t.update(blocksize))
+    # Descomprime mods.zip    
     zip_file = zipfile.ZipFile(f"{rutaMods}/{nombreArchivo}", 'r')
     with tqdm(total=len(zip_file.namelist()), unit='file', unit_scale=True, unit_divisor=1024, miniters=1,
               desc='Extrayendo archivo') as t:
@@ -160,6 +161,7 @@ def descargar_archivo(urlArchivo, nombreArchivo, rutaMods):
             zip_file.extract(archivo, rutaMods)
             t.update()
     zip_file.close()
+    # Borra mods.zip
     os.remove(f"{rutaMods}/{nombreArchivo}")
 
 def verificar_version(urlVersion,rutaMods):
@@ -192,6 +194,7 @@ def verificar_version(urlVersion,rutaMods):
         with open(f"{rutaMods}/version.txt", "w") as f:
             f.write(version_actual)
         os.system("pause")
+        
 def mc_and_forge_version(ruta,minecraftForge):
     ruta_local = f'{ruta}/minecraft_forge.txt'
     urllib.request.urlretrieve(minecraftForge, ruta_local)
