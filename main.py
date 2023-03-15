@@ -18,8 +18,9 @@ minecraft_forge = config["minecraft_forge"]
 def pregunta_ruta():
     print("\033[4;31m"+"IMPORTANTE SE BORRARAN TODOS TUS ARCHIVOS DE .MINECRAFT/MODS"+ "\033[0m")
     print("\033[31m"+"En caso de error hablame nadie#1565"+ "\033[0m")
-    pregunta = input("¿Has editado la ruta de tu .minecraft? 1.Sí 2.No: ")
-    pregunta = int(pregunta) if pregunta.isdigit() and int(pregunta) in [1, 2] else pregunta_ruta()
+    pregunta = input("¿Has editado la ruta de tu .minecraft? (yes/no)").lower()
+    if pregunta != "yes" and pregunta!= "no":
+        pregunta_ruta()
     ruta = ruta_minecraft(pregunta)
     os.system("cls")
     if ruta == None:
@@ -27,10 +28,10 @@ def pregunta_ruta():
         ruta = os.path.join(os.environ['APPDATA'], '.minecraft')
     return ruta
 
-def ruta_minecraft(preguntaRuta):
+def ruta_minecraft(respuestaRuta):
     ruta_minecraft = os.path.join(os.environ['APPDATA'], '.minecraft')
 
-    if not os.path.exists(ruta_minecraft) and preguntaRuta == 2:
+    if not os.path.exists(ruta_minecraft) and respuestaRuta == "no":
         print("La ruta de .Minecraft no existe. Verifica la ruta.")
         print("""
             Lista de posibles errores:
@@ -46,25 +47,26 @@ def ruta_minecraft(preguntaRuta):
         os.system("pause")
         pregunta_ruta()
     
-    if preguntaRuta == 1:
-        if os.path.exists(ruta_minecraft):
-            respuesta_confirmacion = input("\033[31m.minecraft se ha detectado correctamente. ¿Estás seguro de que quieres continuar? 1.Sí 2.No: \033[0m")
-            if respuesta_confirmacion.isdigit() and int(respuesta_confirmacion) == 2:
-                return None
-
-        while preguntaRuta == 1:
-            ruta_minecraft = input("Introduce la ruta de la carpeta .minecraft, por ejemplo, C:/Users/AppData/Roaming/.minecraft: ")
-            ruta_minecraft = os.path.normpath(ruta_minecraft)
-
-            if os.path.exists(os.path.join(os.path.dirname(ruta_minecraft), ".minecraft")):
-                ruta_minecraft = (ruta_minecraft)
-                print("\033[32m.minecraft se ha detectado correctamente en la ruta:", ruta_minecraft, "\033[0m")
-                preguntaRuta = None
-                respuesta_confirmacion = None
-            else:
-                os.system("cls")
-                print("\033[31m.minecraft no se ha encontrado en la ruta proporcionada:", ruta_minecraft, "\033[0m")
-
+    if not (respuestaRuta == "yes" and os.path.exists(ruta_minecraft)):
+        return
+    
+    respuesta_confirmacion = input("\033[31m.minecraft se ha detectado correctamente. ¿Estás seguro de que quieres continuar? (yes/no) \033[0m").lower()
+    if respuesta_confirmacion == "no":
+        return
+    
+    incorrect_path = True
+    while incorrect_path:
+        ruta_minecraft = input("Introduce la ruta de la carpeta .minecraft, por ejemplo, C:/Users/AppData/Roaming/.minecraft: ")
+        ruta_minecraft = os.path.normpath(ruta_minecraft)
+    
+        if not os.path.exists(os.path.join(os.path.dirname(ruta_minecraft), ".minecraft")):
+            os.system("cls")
+            print("\033[31m.minecraft no se ha encontrado en la ruta proporcionada:", ruta_minecraft, "\033[0m")
+            continue
+        
+        print("\033[32m.minecraft se ha detectado correctamente en la ruta:", ruta_minecraft, "\033[0m")
+        incorrect_path = False    
+       
     return ruta_minecraft
 
 def verificar_forge(rutaMinecraft,minecraftVersion,forgeVersion):
@@ -106,45 +108,6 @@ def find_java():
             raise Exception('No se encontró una instalación de Java en el sistema.')
     return java_path
 
-#def descargar_forge(minecraftVersion, forgeVersion, rutaMinecraft):
-    installer_url = f"https://maven.minecraftforge.net/net/minecraftforge/forge/{version}/forge-{version}-installer.jar"
-
-    while respuesta.lower() not in ("s", "n"):
-        respuesta = input("¿Desea instalar Forge? (s/n)")
-        if respuesta.lower() == "s":
-            url = f"https://files.minecraftforge.net/maven/net/minecraftforge/forge/{minecraftVersion}-{forgeVersion}/forge-{minecraftVersion}-{forgeVersion}-installer.jar"
-            nombre_archivo = f"forge-{minecraftVersion}-{forgeVersion}-installer.jar"
-            ruta_descarga = os.path.join(rutaMinecraft, nombre_archivo)
-
-            print("\033[32m" + f"Descargando {nombre_archivo} desde {url}" + "\033[0m")
-            time.sleep(1)
-            respuesta = requests.get(url)
-
-            with open(ruta_descarga, "wb") as archivo:
-                archivo.write(respuesta.content)
-            os.system("cls")
-            print("\033[0;32m"+"Descarga completa!"+ "\033[0m")
-            time.sleep(1)
-            os.system("cls")
-
-            print("\033[0;32m"+"Instalando "+nombre_archivo+"..."+ "\033[0m")
-            time.sleep(2)
-            os.system("cls")
-            java_path = find_java()
-            if java_path is not None:
-                subprocess.call([java_path, "-jar", rutaMinecraft + f"\{nombre_archivo}", "--installServer", ruta_descarga])
-            else:
-                print("\033[91m" + "Java no está instalado en este sistema." + "\033[0m")
-            # Eliminar el instalador de Forge
-            os.remove(f"forge-{minecraftVersion}-{forgeVersion}-installer.jar")
-            print("\033[0;32m"+"¡Instalación completa!"+ "\033[0m")
-            time.sleep(1.3) 
-            return True
-        elif respuesta.lower() == "n":
-            print("\033[91m" + "No se ha instalado Forge." + "\033[0m")
-            return False
-        else:
-            print("\033[91m" + "Respuesta inválida. Por favor ingrese 's' o 'n'." + "\033[0m")
 
 def descargar_forge(minecraftVersion,forgeVersion,ruta):
     # Preguntar al usuario si desea instalar Forge
@@ -251,7 +214,12 @@ def crear_carpeta_mods(rutaMods):
         print("\033[32mOkey\033[0m...")
         time.sleep(1.2)
     
-        
+def update_app():
+    ruta_local = f'{ruta}/minecraft_forge.txt'
+
+    with open(ruta_local, 'r') as archivo:
+        datos = archivo.readlines()
+
 ruta = pregunta_ruta()
 ruta_mods = os.path.join(ruta, 'mods')
 minecraft_version, forge_version, app_version = mc_and_forge_version(ruta,minecraft_forge)
